@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import numpy as np
@@ -349,6 +349,9 @@ def run_viewer(
     ctrl_rect = pygame.Rect(viewport.width, 632, panel_width, size[1] - 632)
 
     offsets = ray_offsets(cfg.sensors)
+    if human:
+        # lo stallo e il limite di passi servono all'evoluzione, non a chi guida
+        cfg = replace(cfg, episode=replace(cfg.episode, stall_steps=1 << 40, max_steps=1 << 40))
     driver = HumanDriver() if human else None
     net = PopulationNetwork(genomes, cfg.layer_sizes)
     controller = driver if human else net
@@ -395,9 +398,11 @@ def run_viewer(
                     focus = (focus + 1) % sim.net.size
                 elif event.key == pygame.K_l and sim.active.size:
                     focus = int(sim.active[np.argmax(sim.progress[sim.active])])
-                elif event.key in (pygame.K_UP, pygame.K_EQUALS, pygame.K_PLUS):
+                elif event.key in (pygame.K_EQUALS, pygame.K_PLUS) or (
+                        event.key == pygame.K_UP and not human):
                     speed_mult = min(32, speed_mult * 2)
-                elif event.key in (pygame.K_DOWN, pygame.K_MINUS):
+                elif event.key == pygame.K_MINUS or (
+                        event.key == pygame.K_DOWN and not human):
                     speed_mult = max(1, speed_mult // 2)
 
         if human:

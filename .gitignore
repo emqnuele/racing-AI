@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+checkpoints/*.npz
+!checkpoints/latest.npz
+checkpoints/*.csv
+*.png
+!docs/*.png
+!checkpoints/training_curve.png
+.DS_Store
+.ruff_cache/

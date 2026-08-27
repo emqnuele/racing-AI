@@ -2,7 +2,7 @@
 
 Neuroevolution: 100 cars race with random weights, the best breed, and then repeat. I saw a video on evolving controllers by breeding and mutation, and I was struck by how closely it mirrors actual selection, and wanted to build it myself to see whether it really works. It does.
 
-https://github.com/user-attachments/assets/68785b56-f2a4-4795-b63a-dcb6c13a6a68
+https://github.com/user-attachments/assets/c8c9c8f0-3803-4c2d-931e-6c653ede56c2
 
 ## Design
 

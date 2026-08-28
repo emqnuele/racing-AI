@@ -133,3 +133,37 @@ def test_wrecks_are_hidden_unless_asked_for():
 
     assert wreck_pixels(False) < wreck_pixels(True)
     pygame.quit()
+
+
+def test_arrow_keys_steer_the_way_they_point_on_screen():
+    from racing_ai.render import HumanDriver
+
+    cfg = Config()
+    track = make_track(1_000_000, cfg.track)
+    view = View(scale=1.0, offset_x=0.0, offset_y=0.0)
+
+    def screen_turn(left, right):
+        driver = HumanDriver()
+        driver.apply_keys(left, right, up=True, down=False)
+        sim = Simulation(driver, track, cfg)
+        start = view.to_screen(np.array([[np.cos(sim.heading[0]), np.sin(sim.heading[0])]]))[0]
+        for _ in range(15):
+            sim.step()
+        end = view.to_screen(np.array([[np.cos(sim.heading[0]), np.sin(sim.heading[0])]]))[0]
+        # in pixel la y cresce verso il basso, quindi il prodotto vettoriale è
+        # positivo quando la macchina ruota in senso orario, cioè verso destra
+        return start[0] * end[1] - start[1] * end[0]
+
+    assert screen_turn(left=False, right=True) > 0
+    assert screen_turn(left=True, right=False) < 0
+    assert screen_turn(left=True, right=True) == 0
+
+
+def test_human_keys_map_to_steer_and_throttle():
+    from racing_ai.render import HumanDriver
+
+    driver = HumanDriver()
+    driver.apply_keys(left=False, right=False, up=True, down=False)
+    assert (driver.steer, driver.throttle) == (0.0, 1.0)
+    driver.apply_keys(left=False, right=False, up=False, down=True)
+    assert (driver.steer, driver.throttle) == (0.0, -1.0)

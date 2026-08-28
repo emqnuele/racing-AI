@@ -286,6 +286,11 @@ class HumanDriver:
         self.steer = 0.0
         self.throttle = 0.0
 
+    # a schermo la y è ribaltata, quindi heading crescente si vede come virata a sinistra
+    def apply_keys(self, left: bool, right: bool, up: bool, down: bool) -> None:
+        self.steer = float(left) - float(right)
+        self.throttle = float(up) - float(down)
+
     def forward(self, x, sel=None):
         out = np.array([[self.steer, self.throttle]], dtype=np.float32)
         return np.repeat(out, x.shape[0], axis=0)
@@ -407,8 +412,8 @@ def run_viewer(
 
         if human:
             keys = pygame.key.get_pressed()
-            driver.steer = float(keys[pygame.K_RIGHT]) - float(keys[pygame.K_LEFT])
-            driver.throttle = float(keys[pygame.K_UP]) - float(keys[pygame.K_DOWN])
+            driver.apply_keys(keys[pygame.K_LEFT], keys[pygame.K_RIGHT],
+                              keys[pygame.K_UP], keys[pygame.K_DOWN])
 
         if not paused:
             for _ in range(speed_mult):
